@@ -301,8 +301,7 @@ turn on 550,460 through 964,782
 turn on 31,760 through 655,892
 toggle 628,958 through 811,992";
 
-// Create 1000x1000 grid initialized to false (off)
-$grid = array_fill(0, 1000, array_fill(0, 1000, false));
+$grid = array_fill(0, 1000, array_fill(0, 1000, 0));
 
 foreach (explode("
 ", $lines) as $line) {
@@ -312,20 +311,36 @@ foreach (explode("
 
     for ($i = intval($line[1]); $i <= intval($line[4]); $i++) {
         for ($j = intval($line[2]); $j <= intval($line[5]); $j++) {
-            $grid[$i][$j] = match ($line[0]) {
-                'on'     => true,
-                'off'    => false,
-                'toggle' => !$grid[$i][$j]
-            };
+
+            switch ($line[0])
+            {
+                case "on":
+                    $grid[$i][$j]++;
+                    break;
+
+                case "off":
+                    $grid[$i][$j] = max(0, $grid[$i][$j] - 1);
+                    break;
+
+                case "toggle":
+                    $grid[$i][$j] = $grid[$i][$j] + 2;
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }
 
 $count = 0;
 
-foreach($grid as $row)
-    foreach ($row as $light)
-        if ($light)
-            $count++;
+foreach ($grid as $row) {
+    foreach ($row as $light) {
+        $count += $light;
+    }
+}
 
-var_dump($count);
+echo $count;
+
+//17325717
